@@ -30,12 +30,13 @@ const router = createRouter({
 router.beforeEach((to, form, next) => {
   const token = localStorage.getItem("token");
   if (to.path == "/login") {
-    return next();
-  }
-  if (token) {
-    return next();
+    next();
   } else {
-    return next("/login");
+    if (token) {
+      next();
+    } else {
+      next("/login");
+    }
   }
 });
 

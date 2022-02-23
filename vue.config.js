@@ -1,3 +1,6 @@
+const { name } = require("./package.json");
+process.env.VUE_APP_TITLE = name;
+
 module.exports = {
   publicPath: "",
   assetsDir: "static",
