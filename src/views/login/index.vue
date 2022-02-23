@@ -20,8 +20,13 @@
             <el-input type="password" v-model.trim="form.password"></el-input>
           </el-form-item>
           <el-form-item label="验证码" prop="password">
-            <el-input :maxlength="5" v-model.trim="form.code"></el-input>
-            <img class="code" src="@/assets/images/captcha.gif" alt="验证码" />
+            <el-input :maxlength="5" v-model.trim="form.captcha"></el-input>
+            <img
+              class="code"
+              :src="captchaPath"
+              alt="验证码"
+              @click="getCaptcha"
+            />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="handleLogin">登录</el-button>
@@ -33,14 +38,19 @@
 </template>
 
 <script>
+import { login } from "@/api/login";
+import { getUUID } from "@/utils/utils";
+import { baseURL } from "@/config";
 export default {
   name: "login",
   data() {
     return {
+      captchaPath: "",
       form: {
         username: "",
         password: "",
-        code: "",
+        captcha: "",
+        uuid: "",
       },
       rules: {
         username: [
@@ -57,7 +67,7 @@ export default {
             trigger: "blur",
           },
         ],
-        code: [
+        captcha: [
           {
             required: true,
             message: "请输入验证码",
@@ -67,11 +77,22 @@ export default {
       },
     };
   },
+  created() {
+    this.getCaptcha();
+  },
   methods: {
+    // 验证码
+    getCaptcha() {
+      this.form.uuid = getUUID();
+      this.captchaPath = `${baseURL}/captcha?uuid=${this.form.uuid}`;
+    },
+    // 处理登录
     handleLogin() {
-      this.$refs["form"].validate((valid) => {
+      this.$refs["form"].validate(async (valid) => {
         if (valid) {
           console.log(this.form, "登录信息");
+          const sendObj = { ...this.form };
+          await login(sendObj);
         }
       });
     },
